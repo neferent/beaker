@@ -11,9 +11,11 @@
     <!-- <a class="left-navigation__link" @click="changeSection('dropdowns')">Dropdowns</a> -->
     <a class="left-navigation__link" @click="changeSection('forms')">Forms</a>
     <a class="left-navigation__link" @click="changeSection('icons')">Icons</a>
+    <a class="left-navigation__link" @click="changeSection('image-pickers')">Image Picker</a>
     <a class="left-navigation__link" @click="changeSection('inputs')">Inputs</a>
     <a class="left-navigation__link" @click="changeSection('paginations')">Paginations</a>
     <!-- <a class="left-navigation__link" @click="changeSection('merch')">Merch</a> -->
+    <a class="left-navigation__link" @click="changeSection('progress-bars')">Progress Bars</a>
     <a class="left-navigation__link" @click="changeSection('sliders')">Sliders</a>
     <a class="left-navigation__link" @click="changeSection('tables')">Tables</a>
     <a class="left-navigation__link" @click="changeSection('tabs')">Tabs</a>
@@ -24,12 +26,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-
 @Component({})
 export default class LeftNavigation extends Vue {
   @Prop()
   activeSection!: string;
-
   changeSection(activeSection: string) {
     this.$emit("update-section", activeSection);
   }
@@ -38,12 +38,10 @@ export default class LeftNavigation extends Vue {
 
 <style lang="less" scoped>
 @import "./../styles/Imports";
-
 .left-navigation {
   display: flex;
   flex-direction: column;
 }
-
 .left-navigation__link {
   text-decoration: none;
   cursor: default;
