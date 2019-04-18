@@ -72,10 +72,12 @@ export default class SiteSearch extends Vue {
     search_input: HTMLInputElement;
   };
 
+  private searchInput: Number = 0;
   result: any = [];
   private isOpen: Boolean = false;
   private phaseOne: Boolean = false;
   private phaseTwo: Boolean = false;
+  private searchOpen: Boolean = false;
   private resultLimit: Number = 7;
   private fuse: any = null;
   private value: String = "";
@@ -84,6 +86,9 @@ export default class SiteSearch extends Vue {
   @Prop()
   jsonSearch!: any;
   searchData = this.jsonSearch;
+
+  @Prop({ default: "beaker-dummy" })
+  searchLib!: string;
 
   @Prop({ default: "" })
   search!: String;
@@ -131,12 +136,6 @@ export default class SiteSearch extends Vue {
     } else {
       return false;
     }
-  }
-
-  get limitedResult() {
-    return this.resultLimit
-      ? this.result.slice(0, this.resultLimit).sort(this.sortWeight)
-      : this.result;
   }
 
   @Watch("searchData")
@@ -198,12 +197,16 @@ export default class SiteSearch extends Vue {
     }
   }
 
-  sortWeight(a, b) {
-    return b.weight - a.weight;
-  }
-
   mounted() {
     this.initFuse();
+  }
+
+  get limitedResult() {
+    return this.resultLimit
+      ? this.result
+          .slice(0, this.resultLimit)
+          .sort((a, b) => b.weight - a.weight)
+      : this.result;
   }
 }
 </script>
@@ -238,14 +241,14 @@ export default class SiteSearch extends Vue {
   border-radius: @radius;
   height: 40px;
   max-width: 500px;
-  min-width: 305px;
+  //min-width: 305px;
   position: relative;
   transform-origin: top;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.s-sitesearch--phase-one {
     background-color: @day-bg;
-    height: 280px;
+    height: 285px;
   }
 
   > i {
@@ -258,10 +261,6 @@ export default class SiteSearch extends Vue {
   flex-direction: row;
   align-items: center;
   .input-padding();
-}
-
-.s-sitesearch--icon {
-  height: 14px;
 }
 
 .s-sitesearch-results__cont {
@@ -386,11 +385,5 @@ export default class SiteSearch extends Vue {
     color: @icon;
   }
 
-  .s-sitesearch-results {
-    &:hover {
-      background-color: @night-dropdown-bg;
-      color: @night-title;
-    }
-  }
 }
 </style>
