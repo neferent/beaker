@@ -27,7 +27,6 @@ export default class Checkbox extends Vue {
   handleInput() {
     this.$emit("update-value", this.checkboxValue);
   }
-
 }
 </script>
 

@@ -250,6 +250,3 @@ export default class Accordian extends Vue {
   opacity: 0;
 }
 </style>
-
-
-
