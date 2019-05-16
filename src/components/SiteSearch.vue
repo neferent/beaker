@@ -1,13 +1,5 @@
 <template>
-  <div
-    class="s-sitesearch"
-    :class="[
-      { 's-sitesearch--is-open': isOpen },
-      { 's-sitesearch--phase-one': phaseOne },
-      { 's-sitesearch--phase-two': phaseTwo }
-    ]"
-    :style="calcHeight"
-  >
+  <div class="s-sitesearch">
     <div class="s-sitesearch--searchbar__cont">
       <div class="s-sitesearch--icon">
         <i class="icon-search"></i>
@@ -18,19 +10,19 @@
         v-model="value"
         placeholder="Search Streamlabs..."
         class="s-sitesearch__input"
-        @focus.stop.prevent="playOpeningSequence"
-        @blur.stop.prevent="playClosingSequence"
+        @focus.stop.prevent="toggleSearch"
+        @blur.stop.prevent="toggleSearch"
         @keyup.stop.prevent="keyEvent"
-      />
-      <div class="s-sitesearch-status__cont">
-        <div v-if="noResults">No Results</div>
-      </div>
+      >
+      <transition name="s-sitesearch--status">
+        <div class="s-sitesearch-status__cont" v-if="noResults">No Results</div>
+      </transition>
     </div>
-    <transition-group name="s-sitesearch--fadeY">
+    <transition name="expand" @enter="open" @after-enter="afterOpen" @leave="close">
       <div
         class="s-sitesearch-results__cont"
         :key="limitedResult.length"
-        v-if="phaseTwo && limitedResult.length <= 0"
+        v-if="searchOpen && limitedResult.length <= 0"
       >
         <div class="s-sitesearch-quicklinks">Quick Links</div>
         <a
@@ -43,44 +35,70 @@
           @mouseup="blurSearch"
         >
           <div class="s-sitesearch__result--image">
-            <i
-              :class="searchData[quickLinkLoc[i]].image"
-              class="s-sitesearch__result--image"
-            ></i>
+            <i :class="searchData[quickLinkLoc[i]].image" class="s-sitesearch__result--image"></i>
           </div>
-          <div class="s-sitesearch__result--title">
-            {{ searchData[quickLinkLoc[i]].title }}
-          </div>
+          <div class="s-sitesearch__result--title">{{ searchData[quickLinkLoc[i]].title }}</div>
         </a>
       </div>
+    </transition>
+    <transition name="expand" @enter="open" @after-enter="afterOpen" @leave="close">
       <div
         class="s-sitesearch-results__cont"
         :key="limitedResult.length"
-        v-if="phaseTwo && limitedResult.length >= 1"
+        v-if="searchOpen && limitedResult.length >= 1"
       >
-        <transition-group name="s-sitesearch--fadeX">
+        <transition-group name="s-sitesearch--result">
           <a
             :href="searchResult.item.route"
             v-for="(searchResult, i) in limitedResult"
             :key="searchResult.item.name"
-            class="s-sitesearch-results"
-            :class="{ 's-active-result': currentResult === i }"
             @mouseover="currentResult = i"
             @mouseup="blurSearch"
+            class="s-sitesearch--href"
           >
-            <div class="s-sitesearch__result--image">
-              <i
-                :class="searchResult.item.image"
-                class="s-sitesearch__result--image"
-              ></i>
+            <div
+              class="s-usersearch-results"
+              :class="{ 's-active': currentResult === i }"
+              v-if="searchResult.item.type === 'user'"
+            >
+              <div class="s-usersearch-header-cont" key="userHeaderCont">
+                <div
+                  class="s-usersearch__result--image"
+                  :class="{ 's-active': currentResult === i }"
+                >
+                  <i class="icon-user s-sitesearch__result--image"></i>
+                </div>
+                <div class="s-usersearch-title-cont">
+                  <div
+                    class="s-usersearch--title"
+                    :class="{ 's-active': currentResult === i }"
+                  >{{ searchResult.item.title }}</div>
+                  <transition name="s-usersearch--status">
+                    <div class="s-usersearch--badges" v-if="currentResult === i">
+                      <i class="icon-loyalty"></i>
+                      <span>Subscriber</span>
+                      <i class="icon-earnings"></i>
+                      <span>Tipper</span>
+                    </div>
+                  </transition>
+                </div>
+              </div>
             </div>
-            <div class="s-sitesearch__result--title">
-              {{ searchResult.item.title }}
+
+            <div
+              class="s-sitesearch-results"
+              :class="{ 's-active-result': currentResult === i }"
+              v-if="searchResult.item.type !== 'user'"
+            >
+              <div class="s-sitesearch__result--image">
+                <i :class="searchResult.item.image" class="s-sitesearch__result--image"></i>
+              </div>
+              <div class="s-sitesearch__result--title">{{ searchResult.item.title }}</div>
             </div>
           </a>
         </transition-group>
       </div>
-    </transition-group>
+    </transition>
   </div>
 </template>
 
@@ -95,15 +113,60 @@ export default class SiteSearch extends Vue {
   };
 
   result: any = [];
+  resultUser: any = [];
+  completeResult: any = [];
   private isOpen: Boolean = false;
-  private phaseOne: Boolean = false;
-  private phaseTwo: Boolean = false;
+  private searchOpen: Boolean = false;
   private resultLimit: Number = 7;
   private fuse: any = null;
+  private user: any = null;
   private value: String = "";
   private quickLinkLoc: any = [];
   private keyEvents: any = [];
   private currentResult: number = 0;
+
+  private tempUserData: any = {
+    user: [
+      {
+        type: "user",
+        name: "Neferent",
+        title: "Neferent",
+        keywords: "Neferent, neferentlive@gmail.com",
+        email: "neferentlive@gmail.com",
+        subscriber: true,
+        tipper: true,
+        recentEvent: "Subscribed, Tier 3, 13 days ago",
+        totalTips: "$567.25 Total Tips",
+        otherNames: "Also Known As: thatfeker, eager2cheese",
+        weight: 15
+      },
+      {
+        type: "user",
+        name: "Neferentlive",
+        title: "Neferentlive",
+        keywords: "Neferent, neferentlive@gmail.com",
+        email: "neferentlive@gmail.com",
+        subscriber: true,
+        tipper: true,
+        recentEvent: "Subscribed, Tier 3, 13 days ago",
+        totalTips: "$567.25 Total Tips",
+        otherNames: "Also Known As: thatfeker, eager2cheese",
+        weight: 15
+      },
+      {
+        type: "user",
+        name: "gggggg",
+        title: "gggggg",
+        keywords: "gggggg",
+        subscriber: true,
+        tipper: true,
+        recentEvent: "Subscribed, Tier 3, 13 days ago",
+        totalTips: "$567.25 Total Tips",
+        otherNames: "Also Known As: thatfeker, eager2cheese",
+        weight: 15
+      }
+    ]
+  };
 
   @Prop()
   jsonSearch!: any;
@@ -169,7 +232,8 @@ export default class SiteSearch extends Vue {
   }
 
   get fullSort() {
-    return this.result.sort(this.sortWeight);
+    let completeResult = this.result.concat(this.resultUser);
+    return completeResult;
   }
 
   get limitedResult() {
@@ -178,26 +242,52 @@ export default class SiteSearch extends Vue {
       : this.fullSort;
   }
 
-  get calcHeight() {
-    if (this.phaseOne === false) {
-      return "height: 40px;";
-    }
-    if (
-      this.result.length >= 1 &&
-      this.result.length <= 7 &&
-      this.phaseOne == true
-    ) {
-      let x = parseInt(this.result.length) * 32 + 47;
-      return "height: " + x + "px;";
-    } else {
-      return "height: 271px;";
-    }
+  toggleSearch() {
+    this.searchOpen = !this.searchOpen;
+  }
+
+  afterOpen(element) {
+    element.style.height = "auto";
+  }
+
+  open(element) {
+    let width = getComputedStyle(element).width;
+    element.style.width = width;
+    let maxWidth = getComputedStyle(element).width;
+    element.style.maxWidth = maxWidth;
+    element.style.position = `absolute`;
+    element.style.visibility = `hidden`;
+    element.style.height = `auto`;
+    let height = getComputedStyle(element).height;
+    element.style.width = null;
+    element.style.position = null;
+    element.style.visibility = null;
+    element.style.height = 0;
+    getComputedStyle(element).height;
+    setTimeout(() => {
+      element.style.height = height;
+    });
+  }
+
+  close(element) {
+    let height = getComputedStyle(element).height;
+    element.style.height = height;
+    getComputedStyle(element).height;
+    setTimeout(() => {
+      element.style.height = 0;
+    });
   }
 
   @Watch("searchData")
   watchSearchData() {
     this.fuse.searchData = this.searchData;
     this.fuseSearch();
+  }
+
+  @Watch("tempUserData")
+  watchUserData() {
+    this.user.tempUserData = this.tempUserData;
+    this.userSearch();
   }
 
   @Watch("search")
@@ -210,6 +300,7 @@ export default class SiteSearch extends Vue {
     this.$parent.$emit(this.inputChangeEventName, this.value);
     this.$emit(this.inputChangeEventName, this.value);
     this.fuseSearch();
+    this.userSearch();
   }
 
   @Watch("result")
@@ -232,12 +323,12 @@ export default class SiteSearch extends Vue {
         this.currentResult++;
       }
     } else {
-      if (event.keyCode === 40 && this.currentResult < 6) {
+      if (event.keyCode === 40 && this.currentResult < this.result.length - 1) {
         this.currentResult++;
       }
     }
     // KEYPRESS ENTER
-    if (event.keyCode === 13 && this.phaseOne) {
+    if (event.keyCode === 13 && this.searchOpen) {
       if (this.result <= 0) {
         window.location.href = this.searchData[
           this.quickLinkLoc[this.currentResult]
@@ -251,33 +342,20 @@ export default class SiteSearch extends Vue {
       }
     }
     // KEYPRESS ESC
-    if (event.keyCode === 27 && this.phaseOne) {
+    if (event.keyCode === 27 && this.searchOpen) {
       this.blurSearch();
-    }
-  }
-
-  playClosingSequence() {
-    if (this.phaseTwo) {
-      setTimeout(() => {
-        this.phaseTwo = !this.phaseTwo;
-      }, 100);
-      setTimeout(() => {
-        this.phaseOne = !this.phaseOne;
-      }, 200);
-    }
-  }
-
-  playOpeningSequence() {
-    if (!this.phaseOne) {
-      this.phaseOne = !this.phaseOne;
-      setTimeout(() => {
-        this.phaseTwo = !this.phaseTwo;
-      }, 100);
     }
   }
 
   initFuse() {
     this.fuse = new Fuse(this.searchData, this.options);
+    if (this.search) {
+      this.value = this.search;
+    }
+  }
+
+  initUser() {
+    this.user = new Fuse(this.tempUserData.user, this.options);
     if (this.search) {
       this.value = this.search;
     }
@@ -297,6 +375,14 @@ export default class SiteSearch extends Vue {
     }
   }
 
+  userSearch() {
+    if (this.value.trim() === "") {
+      this.resultUser = [];
+    } else {
+      this.resultUser = this.user.search(this.value.trim());
+    }
+  }
+
   sortWeight(a, b) {
     let aResult: any = this.result.find(data => data.item.name === a.item.name);
     let bResult: any = this.result.find(data => data.item.name === b.item.name);
@@ -305,6 +391,18 @@ export default class SiteSearch extends Vue {
 
   mounted() {
     this.initFuse();
+    this.initUser();
+  }
+
+  updated() {
+    this.completeResult = this.result.concat(this.resultUser);
+    console.log(this.completeResult);
+    //console.log(this.user)
+    //console.log(this.userSearch)
+    //console.log(this.result);
+    //console.log(this.resultUser)
+    //console.log(this.searchData);
+    //console.log(this.tempUserData.user)
   }
 }
 </script>
@@ -315,19 +413,11 @@ export default class SiteSearch extends Vue {
 .s-sitesearch {
   border: 1px solid @day-input-border;
   border-radius: @radius;
-  height: 40px;
   max-width: 500px;
   position: relative;
   transform-origin: top;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &.s-sitesearch--phase-one {
-    background-color: @day-bg;
-  }
-
-  > i {
-    font-size: 14px;
-  }
+  background-color: @day-bg;
 
   .s-sitesearch__input {
     margin: 0;
@@ -358,8 +448,7 @@ export default class SiteSearch extends Vue {
     color: @icon;
     .margin-right();
     > i {
-      padding: 0;
-      margin: 0;
+      width: 100%;
     }
   }
 
@@ -378,6 +467,10 @@ export default class SiteSearch extends Vue {
     padding-bottom: 1px; // Aligns Icon Better Visually
   }
 
+  .s-sitesearch--href {
+    text-decoration: none;
+  }
+
   .s-sitesearch-results__cont {
     display: flex;
     flex-direction: column;
@@ -388,9 +481,106 @@ export default class SiteSearch extends Vue {
       display: flex;
       align-items: center;
       height: 32px;
+      min-height: 32px;
       font-size: 12px;
       color: @label;
       .input-padding();
+    }
+  }
+
+  .s-usersearch-results {
+    display: flex;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 32px;
+    min-height: 32px;
+    flex-direction: row;
+    .input-padding();
+    .padding-v-sides();
+    text-decoration: none;
+
+    &.s-active {
+      height: 96px;
+      background-color: @day-dropdown-bg;
+      .s-sitesearch__result--image,
+      .s-sitesearch__result--title {
+        color: @day-title;
+      }
+    }
+
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  .s-usersearch-header-cont {
+    height: 32px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.s-active {
+      height: 56px;
+    }
+  }
+
+  .s-usersearch-title-cont {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: space-between;
+  }
+
+  .s-usersearch--title {
+    display: inline-flex;
+    top: 8px;
+    left: 8px;
+    font-size: 14px;
+    color: @day-paragraph;
+    font-weight: @medium;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.s-active {
+      color: @day-title;
+      font-size: 20px;
+      font-weight: @bold;
+    }
+  }
+
+  .s-usersearch--badges {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 10px;
+    @color: @day-paragraph;
+
+    > i {
+      display: inline-flex;
+      color: @teal;
+      .margin-right();
+    }
+
+    > span {
+      display: inline-flex;
+      .margin-right(2);
+    }
+  }
+
+  .s-usersearch__result--image {
+    display: inline-flex;
+    font-size: 14px;
+    height: 100%;
+    color: @icon;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .margin-right();
+    > i {
+      width: 100%;
+    }
+
+    &.s-active {
+      font-size: 32px;
     }
   }
 
@@ -398,13 +588,17 @@ export default class SiteSearch extends Vue {
     font-size: 14px;
     white-space: nowrap;
     color: @icon;
-    .margin-left();
+    position: absolute;
+    right: 0;
+    display: block;
+    .margin-right();
   }
 
   .s-sitesearch-results {
     display: flex;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     height: 32px;
+    min-height: 32px;
     flex-direction: row;
     align-items: center;
     align-content: center;
@@ -419,84 +613,94 @@ export default class SiteSearch extends Vue {
         color: @day-title;
       }
     }
-
-    &:hover {
-      cursor: pointer;
-    }
   }
 
-  .s-sitesearch--fadeX-enter-active {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
+  &:hover {
+    cursor: pointer;
   }
+}
 
-  .s-sitesearch--fadeX-leave-active {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: absolute;
-    opacity: 0;
-  }
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.expand-enter,
+.expand-leave-to {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 0;
+  opacity: 0;
+}
 
-  .s-sitesearch--fadeX-enter {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(10px);
-    opacity: 0;
-  }
+.s-sitesearch--result-enter-active,
+.s-sitesearch--status-enter-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+}
 
-  .s-sitesearch--fadeX-leave-to {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0;
-    transform: translateX(10px);
-  }
+.s-sitesearch--result-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  opacity: 0;
+}
 
-  .s-sitesearch--fadeX-move {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+.s-sitesearch--status-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
 
-  .s-sitesearch--fadeY-enter-active {
-    transition: all 0.25s 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
-  }
+.s-sitesearch--result-enter,
+.s-sitesearch--status-enter,
+.s-sitesearch--result-leave-to,
+.s-sitesearch--status-leave-to {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(10px);
+  opacity: 0;
+}
 
-  .s-sitesearch--fadeY-leave-active {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: absolute;
-    opacity: 0;
-  }
+.s-sitesearch--result-move,
+.s-sitesearch--status-move {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .s-sitesearch--fadeY-enter {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(-10px);
-    opacity: 0;
-  }
+.s-usersearch--status-enter-active {
+  transition: all 0.25s 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+}
 
-  .s-sitesearch--fadeY-leave-to {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+.s-usersearch--status-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
 
-  .s-sitesearch--fadeY-move {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+.s-usersearch--status-leave-active {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.s-usersearch--status-enter,
+.s-usersearch--status-leave-to {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(10px);
+  opacity: 0;
 }
 
 .night {
   .s-sitesearch {
     border: 1px solid @night-input-border;
-
-    &.s-sitesearch--phase-one {
-      background-color: @night-bg;
-    }
+    background-color: @night-bg;
 
     .s-sitesearch__input {
       color: @night-title;
     }
 
-    .s-sitesearch__result--title {
+    .s-sitesearch__result--title,
+    .s-usersearch__result--title {
       color: @night-paragraph;
     }
 
-    .s-sitesearch__result--image {
+    .s-sitesearch__result--image,
+    .s-usersearch__result--image {
       color: @icon;
     }
 
@@ -505,6 +709,15 @@ export default class SiteSearch extends Vue {
         background-color: @night-dropdown-bg;
         .s-sitesearch__result--image,
         .s-sitesearch__result--title {
+          color: @night-title;
+        }
+      }
+    }
+    .s-usersearch-results {
+      &.s-active {
+        background-color: @night-dropdown-bg;
+        .s-usersearch__result--image,
+        .s-usersearch__result--title {
           color: @night-title;
         }
       }
