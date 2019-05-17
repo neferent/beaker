@@ -66,7 +66,7 @@
                   class="s-usersearch__result--image"
                   :class="{ 's-active': currentResult === i }"
                 >
-                  <i class="icon-user s-sitesearch__result--image"></i>
+                  <i class="icon-user"></i>
                 </div>
                 <div class="s-usersearch-title-cont">
                   <div
@@ -86,55 +86,34 @@
                 </div>
               </div>
 
-
               <transition name="s-usersearch--status">
                 <div class="s-usersearch--stats" v-if="currentResult === i">
                   <div class="s-usersearch-stats--row">
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-reset"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.recentEvent }}
-                    </div>
+                    <div class="s-usersearch-stats--content">{{ searchResult.item.recentEvent }}</div>
                   </div>
                   <div class="s-usersearch-stats--row">
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-earnings"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.totalTips }}
-                    </div>
+                    <div class="s-usersearch-stats--content">{{ searchResult.item.totalTips }}</div>
                   </div>
                   <div class="s-usersearch-stats--row">
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-team-2"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.otherNames }}
-                    </div>
-                    <div class="s-username-stats--action">
-                      <div class="s-username-stats--ban">
-                      <span>TIP BAN</span><i class="icon-delete"></i>
+                    <div class="s-usersearch-stats--content">{{ searchResult.item.otherNames }}</div>
+                    <div class="s-usersearch-stats--action">
+                      <div class="s-usersearch-stats--ban">
+                        <span>TIP BAN</span>
+                        <i class="icon-delete"></i>
                       </div>
                     </div>
                   </div>
                 </div>
               </transition>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div>
 
             <div
@@ -146,9 +125,7 @@
                 <i :class="searchResult.item.image" class="s-sitesearch__result--image"></i>
               </div>
               <div class="s-sitesearch__result--title">{{ searchResult.item.title }}</div>
-
             </div>
-
           </a>
         </transition-group>
       </div>
@@ -643,13 +620,11 @@ export default class SiteSearch extends Vue {
     flex-direction: column;
     .padding-top(2);
 
-
     .s-usersearch-stats--row {
       display: flex;
       flex-direction: row;
       align-items: center;
-      .padding(.25);
-
+      .padding(0.25);
 
       .s-usersearch-stats--icon {
         width: 48px;
@@ -663,7 +638,7 @@ export default class SiteSearch extends Vue {
         flex-grow: 3;
       }
 
-      .s-username-stats--action {
+      .s-usersearch-stats--action {
         width: 50px;
         color: @warning;
         font-size: 14px;
@@ -671,21 +646,19 @@ export default class SiteSearch extends Vue {
         align-self: flex-end;
         flex-grow: 1;
 
-        .s-username-stats--ban {
+        .s-usersearch-stats--ban {
           display: flex;
           flex-direction: row;
           align-items: center;
 
-        >i {
-          .margin-left()
+          > i {
+            .margin-left();
+          }
+          > span {
+            display: block;
+            white-space: nowrap;
+          }
         }
-        >span {
-          display: block;
-          white-space: nowrap;
-        }
-        }
-
-
       }
     }
   }
@@ -801,7 +774,7 @@ export default class SiteSearch extends Vue {
     }
 
     .s-sitesearch__result--title,
-    .s-usersearch__result--title {
+    .s-usersearch--title {
       color: @night-paragraph;
     }
 
@@ -819,11 +792,27 @@ export default class SiteSearch extends Vue {
         }
       }
     }
+
     .s-usersearch-results {
       &.s-active {
         background-color: @night-dropdown-bg;
-        .s-usersearch__result--image,
-        .s-usersearch__result--title {
+      }
+    }
+
+    .s-usersearch__result--image,
+    .s-usersearch--title {
+      &.s-active {
+        color: @night-title;
+      }
+    }
+
+    .s-usersearch--stats {
+      .s-usersearch-stats--row {
+        .s-usersearch-stats--icon {
+          color: @night-title;
+        }
+
+        .s-usersearch-stats--content {
           color: @night-title;
         }
       }
