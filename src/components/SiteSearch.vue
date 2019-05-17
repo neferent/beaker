@@ -13,12 +13,17 @@
         @focus.stop.prevent="toggleSearch"
         @blur.stop.prevent="toggleSearch"
         @keyup.stop.prevent="keyEvent"
-      >
+      />
       <transition name="s-sitesearch--status">
         <div class="s-sitesearch-status__cont" v-if="noResults">No Results</div>
       </transition>
     </div>
-    <transition name="expand" @enter="open" @after-enter="afterOpen" @leave="close">
+    <transition
+      name="expand"
+      @enter="open"
+      @after-enter="afterOpen"
+      @leave="close"
+    >
       <div
         class="s-sitesearch-results__cont"
         :key="limitedResult.length"
@@ -35,13 +40,23 @@
           @mouseup="blurSearch"
         >
           <div class="s-sitesearch__result--image">
-            <i :class="searchData[quickLinkLoc[i]].image" class="s-sitesearch__result--image"></i>
+            <i
+              :class="searchData[quickLinkLoc[i]].image"
+              class="s-sitesearch__result--image"
+            ></i>
           </div>
-          <div class="s-sitesearch__result--title">{{ searchData[quickLinkLoc[i]].title }}</div>
+          <div class="s-sitesearch__result--title">
+            {{ searchData[quickLinkLoc[i]].title }}
+          </div>
         </a>
       </div>
     </transition>
-    <transition name="expand" @enter="open" @after-enter="afterOpen" @leave="close">
+    <transition
+      name="expand"
+      @enter="open"
+      @after-enter="afterOpen"
+      @leave="close"
+    >
       <div
         class="s-sitesearch-results__cont"
         :key="limitedResult.length"
@@ -72,11 +87,16 @@
                   <div
                     class="s-usersearch--title"
                     :class="{ 's-active': currentResult === i }"
-                  >{{ searchResult.item.title }}</div>
+                  >
+                    {{ searchResult.item.title }}
+                  </div>
 
                   <!-- Badges -->
                   <transition name="s-usersearch--status">
-                    <div class="s-usersearch--badges" v-if="currentResult === i">
+                    <div
+                      class="s-usersearch--badges"
+                      v-if="currentResult === i"
+                    >
                       <i class="icon-loyalty"></i>
                       <span>Subscriber</span>
                       <i class="icon-earnings"></i>
@@ -92,19 +112,25 @@
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-reset"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">{{ searchResult.item.recentEvent }}</div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.recentEvent }}
+                    </div>
                   </div>
                   <div class="s-usersearch-stats--row">
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-earnings"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">{{ searchResult.item.totalTips }}</div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.totalTips }}
+                    </div>
                   </div>
                   <div class="s-usersearch-stats--row">
                     <div class="s-usersearch-stats--icon">
                       <i class="icon-team-2"></i>
                     </div>
-                    <div class="s-usersearch-stats--content">{{ searchResult.item.otherNames }}</div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.otherNames }}
+                    </div>
                     <div class="s-usersearch-stats--action">
                       <div class="s-usersearch-stats--ban">
                         <span>TIP BAN</span>
@@ -122,9 +148,14 @@
               v-if="searchResult.item.type !== 'user'"
             >
               <div class="s-sitesearch__result--image">
-                <i :class="searchResult.item.image" class="s-sitesearch__result--image"></i>
+                <i
+                  :class="searchResult.item.image"
+                  class="s-sitesearch__result--image"
+                ></i>
               </div>
-              <div class="s-sitesearch__result--title">{{ searchResult.item.title }}</div>
+              <div class="s-sitesearch__result--title">
+                {{ searchResult.item.title }}
+              </div>
             </div>
           </a>
         </transition-group>
