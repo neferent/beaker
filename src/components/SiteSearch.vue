@@ -73,6 +73,8 @@
                     class="s-usersearch--title"
                     :class="{ 's-active': currentResult === i }"
                   >{{ searchResult.item.title }}</div>
+
+                  <!-- Badges -->
                   <transition name="s-usersearch--status">
                     <div class="s-usersearch--badges" v-if="currentResult === i">
                       <i class="icon-loyalty"></i>
@@ -83,6 +85,56 @@
                   </transition>
                 </div>
               </div>
+
+
+              <transition name="s-usersearch--status">
+                <div class="s-usersearch--stats" v-if="currentResult === i">
+                  <div class="s-usersearch-stats--row">
+                    <div class="s-usersearch-stats--icon">
+                      <i class="icon-reset"></i>
+                    </div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.recentEvent }}
+                    </div>
+                  </div>
+                  <div class="s-usersearch-stats--row">
+                    <div class="s-usersearch-stats--icon">
+                      <i class="icon-earnings"></i>
+                    </div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.totalTips }}
+                    </div>
+                  </div>
+                  <div class="s-usersearch-stats--row">
+                    <div class="s-usersearch-stats--icon">
+                      <i class="icon-team-2"></i>
+                    </div>
+                    <div class="s-usersearch-stats--content">
+                      {{ searchResult.item.otherNames }}
+                    </div>
+                    <div class="s-username-stats--action">
+                      <div class="s-username-stats--ban">
+                      <span>TIP BAN</span><i class="icon-delete"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </transition>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             </div>
 
             <div
@@ -94,7 +146,9 @@
                 <i :class="searchResult.item.image" class="s-sitesearch__result--image"></i>
               </div>
               <div class="s-sitesearch__result--title">{{ searchResult.item.title }}</div>
+
             </div>
+
           </a>
         </transition-group>
       </div>
@@ -395,8 +449,8 @@ export default class SiteSearch extends Vue {
   }
 
   updated() {
-    this.completeResult = this.result.concat(this.resultUser);
-    console.log(this.completeResult);
+    //this.completeResult = this.result.concat(this.resultUser);
+    //console.log(this.completeResult);
     //console.log(this.user)
     //console.log(this.userSearch)
     //console.log(this.result);
@@ -493,13 +547,13 @@ export default class SiteSearch extends Vue {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     height: 32px;
     min-height: 32px;
-    flex-direction: row;
+    flex-direction: column;
     .input-padding();
     .padding-v-sides();
     text-decoration: none;
 
     &.s-active {
-      height: 96px;
+      height: 128px;
       background-color: @day-dropdown-bg;
       .s-sitesearch__result--image,
       .s-sitesearch__result--title {
@@ -581,6 +635,58 @@ export default class SiteSearch extends Vue {
 
     &.s-active {
       font-size: 32px;
+    }
+  }
+
+  .s-usersearch--stats {
+    display: flex;
+    flex-direction: column;
+    .padding-top(2);
+
+
+    .s-usersearch-stats--row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .padding(.25);
+
+
+      .s-usersearch-stats--icon {
+        width: 48px;
+        padding-left: 16px;
+        color: @day-title;
+      }
+
+      .s-usersearch-stats--content {
+        color: @day-title;
+        font-weight: @medium;
+        flex-grow: 3;
+      }
+
+      .s-username-stats--action {
+        width: 50px;
+        color: @warning;
+        font-size: 14px;
+        font-weight: @medium;
+        align-self: flex-end;
+        flex-grow: 1;
+
+        .s-username-stats--ban {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+        >i {
+          .margin-left()
+        }
+        >span {
+          display: block;
+          white-space: nowrap;
+        }
+        }
+
+
+      }
     }
   }
 
