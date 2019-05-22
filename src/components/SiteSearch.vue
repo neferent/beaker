@@ -72,77 +72,6 @@
             class="s-sitesearch--href"
           >
             <div
-              class="s-usersearch-results"
-              :class="{ 's-active': currentResult === i }"
-              v-if="searchResult.item.type === 'user'"
-            >
-              <div class="s-usersearch-header-cont" key="userHeaderCont">
-                <div
-                  class="s-usersearch__result--image"
-                  :class="{ 's-active': currentResult === i }"
-                >
-                  <i class="icon-user"></i>
-                </div>
-                <div class="s-usersearch-title-cont">
-                  <div
-                    class="s-usersearch--title"
-                    :class="{ 's-active': currentResult === i }"
-                  >
-                    {{ searchResult.item.title }}
-                  </div>
-
-                  <!-- Badges -->
-                  <transition name="s-usersearch--status">
-                    <div
-                      class="s-usersearch--badges"
-                      v-if="currentResult === i"
-                    >
-                      <i class="icon-loyalty"></i>
-                      <span>Subscriber</span>
-                      <i class="icon-earnings"></i>
-                      <span>Tipper</span>
-                    </div>
-                  </transition>
-                </div>
-              </div>
-
-              <transition name="s-usersearch--status">
-                <div class="s-usersearch--stats" v-if="currentResult === i">
-                  <div class="s-usersearch-stats--row">
-                    <div class="s-usersearch-stats--icon">
-                      <i class="icon-reset"></i>
-                    </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.recentEvent }}
-                    </div>
-                  </div>
-                  <div class="s-usersearch-stats--row">
-                    <div class="s-usersearch-stats--icon">
-                      <i class="icon-earnings"></i>
-                    </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.totalTips }}
-                    </div>
-                  </div>
-                  <div class="s-usersearch-stats--row">
-                    <div class="s-usersearch-stats--icon">
-                      <i class="icon-team-2"></i>
-                    </div>
-                    <div class="s-usersearch-stats--content">
-                      {{ searchResult.item.otherNames }}
-                    </div>
-                    <div class="s-usersearch-stats--action">
-                      <div class="s-usersearch-stats--ban">
-                        <span>TIP BAN</span>
-                        <i class="icon-delete"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </transition>
-            </div>
-
-            <div
               class="s-sitesearch-results"
               :class="{ 's-active-result': currentResult === i }"
               v-if="searchResult.item.type !== 'user'"
@@ -158,7 +87,124 @@
               </div>
             </div>
           </a>
+          <div class="s-sitesearch-result-divider">
+            Users
+            </div>
+
+          <div class="s-usersearch-results" :class="{ 's-active': currentResult === i + limitedResult.length}"
+
+           v-for="(userResult, i) in limitedUserResult"
+          :key="userResult.item.id"
+          @mouseover="currentResult = i + limitedResult.length"
+          @mouseup="blurSearch">
+
+
+              <div class="s-usersearch__result--left">
+                <div class="s-usersearch__result--image">
+              
+                  <i class="icon-question s-usersearch__result--image"></i>
+                </div>
+                <div class="s-usersearch__result--username">
+                  {{ userResult.item.name }}
+                </div>
+                <div class="s-usersearch__result--othernames">
+                  {{ userResult.item.otherNames}}
+                </div>
+              </div>
+              <div class="s-usersearch__result--mid">
+                <div class="s-usersearch__result--lastevent">
+                  {{ userResult.item.recentEvent }}
+                </div>
+                <div class="s-usersearch__result--replayevent">
+                  <i class="icon-reset"></i>
+                </div>
+              </div>
+              <div class="s-usersearch__result--right">
+                <div class="s-usersearch__result--totaltips">
+                  {{ userResult.item.totalTips }}
+                </div>
+                <div class="s-usersearch__result--action">
+                  <div class="s-userserach__result--ban">
+                    Ban
+                  </div>
+                 
+                </div>
+              </div>
+
+
+
+          </div>
         </transition-group>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+            <div class="s-usersearch-results" :class="{ 's-active': currentResult === i }" v-if="searchResult.item.type === 'user'">
+
+
+
+              <div class="s-usersearch__result--left">
+                <div class="s-usersearch__result--image">
+              
+                  <i class="icon-question s-usersearch__result--image"></i>
+                </div>
+                <div class="s-usersearch__result--username">
+                  {{ searchResult.item.name }}
+                </div>
+                <div class="s-usersearch__result--othernames">
+                  {{ searchResult.item.otherNames}}
+                </div>
+              </div>
+              <div class="s-usersearch__result--mid">
+                <div class="s-usersearch__result--lastevent">
+                  {{ searchResult.item.recentEvent }}
+                </div>
+                <div class="s-usersearch__result--replayevent">
+                  <i class="icon-reset"></i>
+                </div>
+              </div>
+              <div class="s-usersearch__result--right">
+                <div class="s-usersearch__result--totaltips">
+                  {{ searchResult.item.totalTips }}
+                </div>
+                <div class="s-usersearch__result--action">
+                  <div class="s-userserach__result--ban">
+                    Ban
+                  </div>
+                 
+                </div>
+              </div>
+
+
+            </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       </div>
     </transition>
   </div>
@@ -179,7 +225,8 @@ export default class SiteSearch extends Vue {
   completeResult: any = [];
   private isOpen: Boolean = false;
   private searchOpen: Boolean = false;
-  private resultLimit: Number = 7;
+  private resultLimit: Number = 4;
+  private resultLimitUser: Number = 3;
   private fuse: any = null;
   private user: any = null;
   private value: String = "";
@@ -191,40 +238,43 @@ export default class SiteSearch extends Vue {
     user: [
       {
         type: "user",
+        id: "dfd2fwdf2",
         name: "Neferent",
         title: "Neferent",
         keywords: "Neferent, neferentlive@gmail.com",
         email: "neferentlive@gmail.com",
         subscriber: true,
         tipper: true,
-        recentEvent: "Subscribed, Tier 3, 13 days ago",
-        totalTips: "$567.25 Total Tips",
-        otherNames: "Also Known As: thatfeker, eager2cheese",
+        recentEvent: "Subbed 31m ago",
+        totalTips: "$198.50 (52)",
+        otherNames: "eager2cheese",
         weight: 15
       },
       {
         type: "user",
+        id: "df333333",
         name: "Neferentlive",
         title: "Neferentlive",
         keywords: "Neferent, neferentlive@gmail.com",
         email: "neferentlive@gmail.com",
         subscriber: true,
         tipper: true,
-        recentEvent: "Subscribed, Tier 3, 13 days ago",
-        totalTips: "$567.25 Total Tips",
-        otherNames: "Also Known As: thatfeker, eager2cheese",
+        recentEvent: "Tipped 2w ago",
+        totalTips: "$8.00 (3)",
+        otherNames: "thatfeker",
         weight: 15
       },
       {
         type: "user",
+        id: "fffffffffffffffffffffff",
         name: "gggggg",
         title: "gggggg",
         keywords: "gggggg",
         subscriber: true,
         tipper: true,
-        recentEvent: "Subscribed, Tier 3, 13 days ago",
-        totalTips: "$567.25 Total Tips",
-        otherNames: "Also Known As: thatfeker, eager2cheese",
+        recentEvent: "Followed 1y ago",
+        totalTips: "$0.00 (0)",
+        otherNames: "geegeegee",
         weight: 15
       }
     ]
@@ -293,15 +343,22 @@ export default class SiteSearch extends Vue {
     }
   }
 
-  get fullSort() {
-    let completeResult = this.result.concat(this.resultUser);
-    return completeResult;
-  }
+  // get fullSort() {
+  //   let completeResult = this.result.concat(this.resultUser);
+  //   return completeResult;
+  // }
+
 
   get limitedResult() {
     return this.resultLimit
-      ? this.fullSort.slice(0, this.resultLimit)
-      : this.fullSort;
+      ? this.result.slice(0, this.resultLimit)
+      : this.result;
+  }
+
+  get limitedUserResult() {
+    return this.resultLimit
+      ? this.resultUser.slice(0, this.resultLimitUser)
+      : this.resultUser;
   }
 
   toggleSearch() {
@@ -385,7 +442,7 @@ export default class SiteSearch extends Vue {
         this.currentResult++;
       }
     } else {
-      if (event.keyCode === 40 && this.currentResult < this.result.length - 1) {
+      if (event.keyCode === 40 && this.currentResult < this.limitedResult.length + this.limitedUserResult.length - 1) {
         this.currentResult++;
       }
     }
@@ -504,7 +561,8 @@ export default class SiteSearch extends Vue {
     font-weight: @medium;
   }
 
-  .s-sitesearch__result--image {
+  .s-sitesearch__result--image,
+  .s-usersearch__result--image {
     width: 14px;
     height: 100%;
     color: @icon;
@@ -555,13 +613,13 @@ export default class SiteSearch extends Vue {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     height: 32px;
     min-height: 32px;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     .input-padding();
     .padding-v-sides();
     text-decoration: none;
 
     &.s-active {
-      height: 128px;
       background-color: @day-dropdown-bg;
       .s-sitesearch__result--image,
       .s-sitesearch__result--title {
@@ -574,125 +632,132 @@ export default class SiteSearch extends Vue {
     }
   }
 
-  .s-usersearch-header-cont {
-    height: 32px;
-    width: 100%;
+  .s-usersearch__result--left,
+  .s-usersearch__result--mid,
+  .s-usersearch__result--right {
     display: flex;
     flex-direction: row;
-    align-content: center;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &.s-active {
-      height: 56px;
-    }
   }
 
-  .s-usersearch-title-cont {
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    justify-content: space-between;
-  }
+  // .s-usersearch-header-cont {
+  //   height: 32px;
+  //   width: 100%;
+  //   display: flex;
+  //   flex-direction: row;
+  //   align-content: center;
+  //   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  .s-usersearch--title {
-    display: inline-flex;
-    top: 8px;
-    left: 8px;
-    font-size: 14px;
-    color: @day-paragraph;
-    font-weight: @medium;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  //   &.s-active {
+  //     height: 56px;
+  //   }
+  // }
 
-    &.s-active {
-      color: @day-title;
-      font-size: 20px;
-      font-weight: @bold;
-    }
-  }
+  // .s-usersearch-title-cont {
+  //   display: flex;
+  //   flex-direction: column;
+  //   align-items: left;
+  //   justify-content: space-between;
+  // }
 
-  .s-usersearch--badges {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 10px;
-    @color: @day-paragraph;
+  // .s-usersearch--title {
+  //   display: inline-flex;
+  //   top: 8px;
+  //   left: 8px;
+  //   font-size: 14px;
+  //   color: @day-paragraph;
+  //   font-weight: @medium;
+  //   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    > i {
-      display: inline-flex;
-      color: @teal;
-      .margin-right();
-    }
+  //   &.s-active {
+  //     color: @day-title;
+  //     font-size: 20px;
+  //     font-weight: @bold;
+  //   }
+  // }
 
-    > span {
-      display: inline-flex;
-      .margin-right(2);
-    }
-  }
+  // .s-usersearch--badges {
+  //   display: flex;
+  //   flex-direction: row;
+  //   align-items: center;
+  //   font-size: 10px;
+  //   @color: @day-paragraph;
 
-  .s-usersearch__result--image {
-    display: inline-flex;
-    font-size: 14px;
-    height: 100%;
-    color: @icon;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  //   > i {
+  //     display: inline-flex;
+  //     color: @teal;
+  //     .margin-right();
+  //   }
 
-    .margin-right();
-    > i {
-      width: 100%;
-    }
+  //   > span {
+  //     display: inline-flex;
+  //     .margin-right(2);
+  //   }
+  // }
 
-    &.s-active {
-      font-size: 32px;
-    }
-  }
+  // .s-usersearch__result--image {
+  //   display: inline-flex;
+  //   font-size: 14px;
+  //   height: 100%;
+  //   color: @icon;
+  //   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  .s-usersearch--stats {
-    display: flex;
-    flex-direction: column;
-    .padding-top(2);
+  //   .margin-right();
+  //   > i {
+  //     width: 100%;
+  //   }
 
-    .s-usersearch-stats--row {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      .padding(0.25);
+  //   &.s-active {
+  //     font-size: 32px;
+  //   }
+  // }
 
-      .s-usersearch-stats--icon {
-        width: 48px;
-        padding-left: 16px;
-        color: @day-title;
-      }
+  // .s-usersearch--stats {
+  //   display: flex;
+  //   flex-direction: column;
+  //   .padding-top(2);
 
-      .s-usersearch-stats--content {
-        color: @day-title;
-        font-weight: @medium;
-        flex-grow: 3;
-      }
+  //   .s-usersearch-stats--row {
+  //     display: flex;
+  //     flex-direction: row;
+  //     align-items: center;
+  //     .padding(0.25);
 
-      .s-usersearch-stats--action {
-        width: 50px;
-        color: @warning;
-        font-size: 14px;
-        font-weight: @medium;
-        align-self: flex-end;
-        flex-grow: 1;
+  //     .s-usersearch-stats--icon {
+  //       width: 48px;
+  //       padding-left: 16px;
+  //       color: @day-title;
+  //     }
 
-        .s-usersearch-stats--ban {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
+  //     .s-usersearch-stats--content {
+  //       color: @day-title;
+  //       font-weight: @medium;
+  //       flex-grow: 3;
+  //     }
 
-          > i {
-            .margin-left();
-          }
-          > span {
-            display: block;
-            white-space: nowrap;
-          }
-        }
-      }
-    }
-  }
+  //     .s-usersearch-stats--action {
+  //       width: 50px;
+  //       color: @warning;
+  //       font-size: 14px;
+  //       font-weight: @medium;
+  //       align-self: flex-end;
+  //       flex-grow: 1;
+
+  //       .s-usersearch-stats--ban {
+  //         display: flex;
+  //         flex-direction: row;
+  //         align-items: center;
+
+  //         > i {
+  //           .margin-left();
+  //         }
+  //         > span {
+  //           display: block;
+  //           white-space: nowrap;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   .s-sitesearch-status__cont {
     font-size: 14px;
