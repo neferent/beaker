@@ -64,6 +64,7 @@ const Tooltip: DirectiveOptions = {
       initTooltip(el,binding);
     },
     update(el, value: any) {
+      console.log('f')
     },
     unbind(el, binding) {
       el.removeEventListener("mouseover", () => { handleMouseOver(el) });

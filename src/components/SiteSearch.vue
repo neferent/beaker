@@ -215,7 +215,7 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from "vue-property-decorator";
 import Fuse from "fuse.js";
-import Tooltip from "../directives/tooltip"
+import Tooltip from "../directives/Tooltip"
 
 @Component({
   directives: {
