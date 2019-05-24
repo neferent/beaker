@@ -87,9 +87,9 @@
               </div>
             </div>
           </a>
-          <div class="s-sitesearch-result-divider">
+          <div class="s-sitesearch__result--divider" v-if="limitedUserResult.length >= 1" key="div">
             Users
-            </div>
+          </div>
 
           <div class="s-usersearch-results" :class="{ 's-active': currentResult === i + limitedResult.length}"
 
@@ -115,7 +115,7 @@
                 <div class="s-usersearch__result--lastevent">
                   {{ userResult.item.recentEvent }}
                 </div>
-                <div class="s-usersearch__result--replayevent">
+                <div class="s-usersearch__result--replayevent" v-tooltip="'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce diam mauris, ullamcorper et ipsum vel.'">
                   <i class="icon-reset"></i>
                 </div>
               </div>
@@ -124,8 +124,10 @@
                   {{ userResult.item.totalTips }}
                 </div>
                 <div class="s-usersearch__result--action">
-                  <div class="s-userserach__result--ban">
-                    Ban
+                  <div class="s-usersearch__result--ban">
+                    <a href="#">
+                      Ban
+                    </a>
                   </div>
                  
                 </div>
@@ -213,8 +215,13 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from "vue-property-decorator";
 import Fuse from "fuse.js";
+import Tooltip from "../directives/tooltip"
 
-@Component({})
+@Component({
+  directives: {
+    Tooltip
+  }
+})
 export default class SiteSearch extends Vue {
   $refs!: {
     search_input: HTMLInputElement;
@@ -528,6 +535,7 @@ export default class SiteSearch extends Vue {
 
 <style lang="less">
 @import "./../styles/Imports";
+@import "./../styles/directives/Tooltips";
 
 .s-sitesearch {
   border: 1px solid @day-input-border;
@@ -614,6 +622,7 @@ export default class SiteSearch extends Vue {
     height: 32px;
     min-height: 32px;
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     .input-padding();
     .padding-v-sides();
@@ -637,6 +646,44 @@ export default class SiteSearch extends Vue {
   .s-usersearch__result--right {
     display: flex;
     flex-direction: row;
+    align-content: center;
+  }
+
+  .s-sitesearch__result--divider {
+    .input-padding();
+    .padding-v-sides();
+    font-size: 12px;
+    font-weight: @normal;
+  }
+
+  .s-usersearch__result--username {
+    font-size: 14px;
+    color: @day-paragraph;
+    font-weight: @medium;
+    .margin-right();
+  }
+
+    .s-usersearch__result--othernames {
+    font-size: 14px;
+    color: @label;
+    font-weight: @medium;
+  }
+
+  .s-usersearch__result--lastevent,
+  .s-usersearch__result--totaltips {
+    font-size: 14px;
+    color: @day-paragraph;
+    .margin-right();
+  }
+
+  .s-usersearch__result--ban,
+  .s-usersearch__result--unban {
+    font-size: 14px;
+    font-weight: @medium;
+
+    a {
+      color: @warning;
+    }
   }
 
   // .s-usersearch-header-cont {
