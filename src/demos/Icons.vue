@@ -1,11 +1,11 @@
 <template>
   <div class="icons">
-    <div class="glyph fs1">
+    <div class="glyph fs1" v-tooltip="'hii theetttttttttttttere'">
       <div class="clearfix bshadow0 pbs">
         <span class="icon-periscope"></span>
         <span class="mls">icon-periscope</span>
       </div>
-      <fieldset class="fs0 size1of1 clearfix hidden-false">
+      <fieldset class="fs0 size1of1 clearfix hidden-false" v-tooltip="'hii theeere'">
         <input type="text" readonly value="e9ba" class="unit size1of2" />
         <input
           type="text"
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="glyph fs1">
-      <div class="clearfix bshadow0 pbs">
+      <div class="clearfix bshadow0 pbs"  v-tooltip="'hii theeere'">
         <span class="icon-windows"></span>
         <span class="mls">icon-windows</span>
       </div>
@@ -3905,13 +3905,21 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import Tooltip from "../directives/tooltip"
 
-@Component({})
+
+
+@Component({
+  directives: {
+    Tooltip
+  }
+})
 export default class Icons extends Vue {}
 </script>
 
 <style lang="less" scoped>
 @import "./../styles/Imports";
+@import "./../styles/directives/Tooltips";
 
 fieldset {
   border: 0;

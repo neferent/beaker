@@ -125,7 +125,7 @@
                 </div>
                 <div class="s-usersearch__result--action">
                   <div class="s-usersearch__result--ban">
-                    <a href="#">
+                    <a href="#" v-tooltip="'Ban this person'">
                       Ban
                     </a>
                   </div>

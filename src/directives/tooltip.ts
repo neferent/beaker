@@ -1,16 +1,5 @@
 import { DirectiveOptions } from 'vue/types/options';
 
-
-
-
-
-
-
-
-
-
-
-
 function queryElement(el) {
   let e = el.getBoundingClientRect(el);
   let q = {
@@ -31,11 +20,11 @@ function initHover(el,) {
   hover.style.width = rect.width + "px";
   hover.style.height = rect.height + "px";
   hover.style.top = "inherit";
+  hover.style.background = "red";
   hover.style.left = "inherit";
   hover.style.zIndex = "40";
   hover.className = "s-tooltip__hover";
   el.insertAdjacentElement("afterbegin", hover);
-  //hover.style.transform = "translate(" + (parent.width - rect.width) + "px, 0)";
   el.parentElement.querySelector(".s-tooltip__hover").addEventListener("mouseover", () => { handleMouseOver(el) });
   el.parentElement.querySelector(".s-tooltip__hover").addEventListener("mouseout", () => { handleMouseOut(el) });
 }
@@ -97,6 +86,8 @@ function initTooltip(el, binding) {
   let placement = getPlacement(el);
 
   tooltip.style.transform = "translate(" + placement.leftOffset + "px," + placement.topOffset + "px)";
+
+  
 }
 
 
