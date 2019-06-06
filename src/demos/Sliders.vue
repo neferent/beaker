@@ -196,7 +196,7 @@ components: {
       <div class="row">
         <h1>NEW SLIDER</h1>
         <p>Dont use this yet.</p>
-        <div class="flex-row">
+
           <slider-two
             :value="localValue"
             @input="value => updateLocalValue(value)"
@@ -205,8 +205,8 @@ components: {
             :dataIndexing="false"
             :suffix="'%'"
           />
-          <div class="icon-holder"><i class="fas fa-question-circle"></i></div>
-        </div>
+          <i class="fas fa-question-circle"></i>
+
       </div>
     </div>
 
@@ -245,7 +245,7 @@ export default class Sliders extends Vue {
   }
 
   value = 50;
-  data = ["one", "two", "three", "four", "five", "six"];
+  data = ["one", "two", "three three three", "four", "five", "six"];
   updateValue(value) {
     console.log(value); // this function is required, it doesn't have to do anything, it just needs to exist.
   }

@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrap" class="s-slider" @click="wrapClick">
+<div ref="wrap" class="s-slider" @click="wrapClick">
     <div ref="elem" class="s-slider-bar">
       <template>
         <div ref="handle" class="s-slider-dot-cont" @mousedown="moveStart">
@@ -111,11 +111,11 @@ export default class SliderTwo extends Vue {
   draggable!: boolean;
 
   get val() {
-    if (this.dataIndexing) {
-      return this.data ? this.data.indexOf(this.data[this.currentValue]): this.currentValue;
-    } else {
+    //if (this.dataIndexing) {
+      //return this.data ? this.data.indexOf(this.data[this.currentValue]): this.currentValue;
+    //} else {
       return this.data ? this.data[this.currentValue] : this.currentValue;
-    }
+    //}
   }
   set val(newVal) {
     if (this.data) {
@@ -130,7 +130,7 @@ export default class SliderTwo extends Vue {
 
   get displayValue() {
     if (this.data) {
-    return this.dataIndexing ? this.data[this.currentIndex] : this.currentValue;
+      return this.dataIndexing ? this.data[this.currentIndex] : this.currentValue;
     } else {
       return this.currentValue;
     }
@@ -306,7 +306,7 @@ export default class SliderTwo extends Vue {
     if (this.isDisabled) return false;
     let pos = this.getPos(e);
     this.setValueOnPos(pos, false);
-    if (!this.isDragging) this.setTransform(this.position);
+    if (!this.isDragging) this.refresh(this.$refs.elem);
   }
 
   moveStart() {
@@ -327,7 +327,7 @@ export default class SliderTwo extends Vue {
       this.$emit("dragEnd", this);
       this.setValue(this.limitValue(this.value));
       this.setTransitionTime(0.125);
-      this.setTransform(this.position);
+      this.refresh(this.$refs.elem)
       this.isDragging = false;
       if (this.lazy && this.isDiff(this.val, this.value)) {
         this.syncValue();
@@ -350,12 +350,12 @@ export default class SliderTwo extends Vue {
     } else if (pos < range[0]) {
       this.halt = true;
       console.log('overshoot1')
-      this.setTransform(range[0]);
+      this.refresh(this.$refs.elem)
       this.setCurrentValue(valueRange[0], true);
     } else {
       this.halt = true;
       console.log('overshoot2')
-      this.setTransform(range[1]);
+      this.refresh(this.$refs.elem)
       this.setCurrentValue(valueRange[1], true);
     }
   }
@@ -496,6 +496,7 @@ export default class SliderTwo extends Vue {
       this.resizeSensor(this.$refs.elem);
       this.bindEvents(this.$refs.elem);
     }
+    this.dnr();
   }
 
   updated() {
@@ -657,6 +658,8 @@ export default class SliderTwo extends Vue {
 .s-slider--ani__ticks-move {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+
 
 .night,
 .night-theme {
